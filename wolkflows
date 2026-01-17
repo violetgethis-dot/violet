@@ -1,0 +1,57 @@
+name: Build Windows EXE
+
+# Запуск при каждом push или вручную
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 Скачать код
+      uses: actions/checkout@v3
+    
+    - name: 🐍 Установить Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 Установить PyInstaller
+      run: pip install pyinstaller
+    
+    - name: 🔨 Собрать EXE
+      run: pyinstaller --onefile --noconsole --name=SystemLocker wlock1.py
+    
+    - name: ⬆️ Загрузить готовый EXE
+      uses: actions/upload-artifact@v3
+      with:
+        name: SystemLocker-Windows-EXE
+        path: dist/SystemLocker.exe
+        retention-days: 30
+
+  build-linux:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Скачать код
+      uses: actions/checkout@v3
+    
+    - name: 🐍 Установить Python и зависимости
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip python3-tk
+    
+    - name: 📦 Установить PyInstaller
+      run: pip install pyinstaller
+    
+    - name: 🔨 Собрать Linux версию
+      run: pyinstaller --onefile --noconsole --name=SystemLocker wlock1.py
+    
+    - name: ⬆️ Загрузить готовый файл
+      uses: actions/upload-artifact@v3
+      with:
+        name: SystemLocker-Linux
+        path: dist/SystemLocker
+        retention-days: 30
